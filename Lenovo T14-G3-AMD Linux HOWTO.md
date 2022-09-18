@@ -60,7 +60,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 
 - The internal microphone does not work (or very low volume)
 - ~My external USB microphone is way to low volume (not usable)~ -> **seems fixed, see below**
-- Suspend does not work (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants
+- Suspend does not work with Wifi is connected (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
 
@@ -106,47 +106,24 @@ Now to NetworkManager. For now we simply add two systemd services to stop
 NetworkManager before sleep and to restart it after resume.
 
 ```
-cat <<EOF > /etc/systemd/system/nm-sleep.service
-[Unit]
-Description=Stop NetworkManager before sleep
-Before=suspend.target
-Before=hibernate.target
-Before=hybrid-sleep.target
+cat <<'EOF' > /usr/lib/systemd/system-sleep/my-nm-fix
+#!/bin/sh
 
-[Service]
-Type=oneshot
-ExecStart=/bin/systemctl stop NetworkManager.service
-
-[Install]
-WantedBy=suspend.target
-WantedBy=hibernate.target
-WantedBy=hybrid-sleep.target
+case $1 in
+    pre)  /bin/systemctl stop NetworkManager.service ;;
+    post) /bin/systemctl restart NetworkManager.service ;;
+esac
 EOF
+chmod 755 /usr/lib/systemd/system-sleep/my-nm-fix
 ```
 
-```
-cat <<EOF > /etc/systemd/system/nm-resume.service
-[Unit]
-Description=Restart NetworkManager at resume
-After=suspend.target
-After=hibernate.target
-After=hybrid-sleep.target
+Unfortunately this does not fix the problem. Everything regarding Wifi hangs as
+soon as NetworkManager recieves the suspend event and disconnects the Wifi card
+which happens before the scripts in system-sleep are run.
 
-[Service]
-Type=oneshot
-ExecStart=/bin/systemctl restart NetworkManager.service
+Disconnecting Wifi manually before suspending, works fine.
 
-[Install]
-WantedBy=suspend.target
-WantedBy=hibernate.target
-WantedBy=hybrid-sleep.target
-EOF
-```
-
-systemctl enable nm-sleep.service
-systemctl enable nm-resume.service
-
-TODO
+Remains unfixed, TODO
 
 
 ### Fix hotkeys to switch workspaces
