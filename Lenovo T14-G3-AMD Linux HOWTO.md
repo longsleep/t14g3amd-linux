@@ -6,13 +6,13 @@ System Information
         Product Name: 21CF004PGE
         Version: ThinkPad T14 Gen 3
         SKU Number: LENOVO_MT_21CF_BU_Think_FM_ThinkPad T14 Gen 3
-        Family: ThinkPad T14 Gen 3        
+        Family: ThinkPad T14 Gen 3
 ```
 
 For now, no specifics to T14-G3-AMD, so follow my [Root Boot Encrypted ZFS Guide](https://gist.github.com/longsleep/48a585219e1c7b5d04b827ed02b029de).
 
 The following guide assumes that you have completed installation and are booted
-into the installed system. 
+into the installed system.
 
 ## After first boot
 
@@ -28,7 +28,7 @@ vi /etc/gdm/custom.conf
 # Save and quit.
 ```
 
-Now `systemctl restart gdm3` and you will be signed out. Now you can choose 
+Now `systemctl restart gdm3` and you will be signed out. Now you can choose
 Wayland session on the bottom right (after selecting your user).
 
 Also install some basics:
@@ -44,11 +44,12 @@ apt install --yes \
     g810-led \
     alacritty \
     python3-pip \
-    lm-sensors
+    lm-sensors \
+    xsel
 ```
 
 This pretty much gives me the basic software to use my [bin-scripts](https://github.com/longsleep/bin-scripts) repository.
-Its now left to the reader how to configure the individual environment. 
+Its now left to the reader how to configure the individual environment.
 
 
 ## Issues
@@ -66,7 +67,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 
 ### Fixing internal microphone
 
-Others reported problems with the microphone for older T14 generations, but 
+Others reported problems with the microphone for older T14 generations, but
 Kernel 5.19 seems to have the quirks for the acp6x in place for `21CF` - so it
 seems to be something else (see https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/sound/soc/amd/yc/acp6x-mach.c?h=v5.19#n80)
 
@@ -87,6 +88,63 @@ This problem is now fixed.
 
 
 ### Fixing suspend
+
+By default neither of the sleep modes possible in BIOS worked for me. One part
+of the problem seem to be NetworkManager which simply hangs on suspend and makes
+things fail completely. So for any successful sleep, NetworkManager needs to be
+stopped. Then it can sleep successfully for both supported mem_sleep modes
+(`s2idle`, deep), but only wakes up again for `s2idle`.
+
+Waking up from `s2idle` requires the latest firmware to be insalled. I fetched
+`linux-firmware-20220913` which is the newest at the time of writing and it
+recently got updates for the amdgpu files.
+
+Extract the latest linux-firmware into `/lib/firmware/updates` and update the
+inird with `update-initramfs -c -k all`. Then reboot.
+
+Now to NetworkManager. For now we simply add two systemd services to stop
+NetworkManager before sleep and to restart it after resume.
+
+```
+cat <<EOF > /etc/systemd/system/nm-sleep.service
+[Unit]
+Description=Stop NetworkManager before sleep
+Before=suspend.target
+Before=hibernate.target
+Before=hybrid-sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/systemctl stop NetworkManager.service
+
+[Install]
+WantedBy=suspend.target
+WantedBy=hibernate.target
+WantedBy=hybrid-sleep.target
+EOF
+```
+
+```
+cat <<EOF > /etc/systemd/system/nm-resume.service
+[Unit]
+Description=Restart NetworkManager at resume
+After=suspend.target
+After=hibernate.target
+After=hybrid-sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/systemctl restart NetworkManager.service
+
+[Install]
+WantedBy=suspend.target
+WantedBy=hibernate.target
+WantedBy=hybrid-sleep.target
+EOF
+```
+
+systemctl enable nm-sleep.service
+systemctl enable nm-resume.service
 
 TODO
 
@@ -111,7 +169,7 @@ This problem is now fixed.
 
 ## Fix fan speed indicator
 
-Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535 
+Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535
 in the vitals Gnome 3 extension while the fan really is off.
 
 It seems that there is a second fan sensor which reports this bogus value.
@@ -159,7 +217,7 @@ Now reboot the computer.
 reboot
 ```
 
-You will see the MOK interface. Press any key to enter it. And select 
+You will see the MOK interface. Press any key to enter it. And select
 "Enroll MOK", verify the key, then select "Continue". You will need the password
 which you entered earlier. Click "OK" and then reboot into the system again.
 
