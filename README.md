@@ -1,0 +1,1 @@
+Lenovo T14-G3-AMD Linux HOWTO.md
