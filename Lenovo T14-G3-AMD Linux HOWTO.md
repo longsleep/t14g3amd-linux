@@ -55,13 +55,14 @@ Its now left to the reader how to configure the individual environment.
 
 The Hardware platform of the T14 Gen3 AMD is pretty new, so there are some Linux compatibilitiy issues.
 
-I see the following issues (Kernel 5.19.0-76051900-generic #202207312230~1660780566~22.04~9d60db1):
+I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~1660780566~22.04~9d60db1`):
 
 - The internal microphone does not work (or very low volume)
-- My external USB microphone is way to low volume (not usable) -> seems fixed, see below
+- ~My external USB microphone is way to low volume (not usable)~ -> **seems fixed, see below**
 - Suspend does not work (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants
-- Hotkeys to switch workspaces do not work, especially when using Workspace matrix -> fixed, see below
-- Fan speed indicator sometimes does show bogus values when fan is off -> not really a problem, see below
+- ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
+- Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
+
 
 ### Fixing internal microphone
 
@@ -77,15 +78,18 @@ We might be able to backport via DKMS (https://www.collabora.com/news-and-blog/b
 
 TODO
 
+
 ### Fixing external USB microphone
 
 Not sure about this one, the problem went away after using alsamixing and sound settings volume control a couple of times.
 
 This problem is now fixed.
 
+
 ### Fixing suspend
 
 TODO
+
 
 ### Fix hotkeys to switch workspaces
 
@@ -104,6 +108,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-down '["<Shift>
 
 This problem is now fixed.
 
+
 ## Fix fan speed indicator
 
 Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535 
@@ -120,15 +125,14 @@ fan2:        65535 RPM
 TODO
 
 
-
-
 ## Secure boot for DKMS Kernel modules
 
-NOTE: This section does not work, so ignore for now.
+NOTE: This section does not work, so ignore for now. Since we need a very new
+Kernel anyways for now without secure boot it is until can sign the Kernel and
+modules with our own key.
 
-Since we use Pop!_OS, there might be additional DKMS Kernel modules which
-need to be singed. A Machine Owner Key (MOK), needs to be created and enrolled
-to Secure Boot. That key is then used to sign all extra Kernel modules.
+A Machine Owner Key (MOK), needs to be created and enrolled to Secure Boot. That
+ key is then used to sign all extra Kernel modules.
 
 All the next steps assume you are in a `root` shell.
 
@@ -171,7 +175,4 @@ vi /etc/dkms/framework.conf
 ```
 
 Well, that did not work - figure out a way.
-
-
-
 
