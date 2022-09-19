@@ -75,7 +75,9 @@ Not sure if Kernel 6.0 would improve things, but but at the time of writing ZFS
 for linux does not support Kernel 6.0 - there is a patch set (https://github.com/openzfs/zfs/pull/13886)
 which includes some fixes for 6.0 compat.
 
-We might be able to backport via DKMS (https://www.collabora.com/news-and-blog/blog/2021/05/05/quick-hack-patching-kernel-module-using-dkms/).
+Backporting ZFS to support Kernel 6.0 (see below in the fixing suspend section)
+did unfortunately not fix the microphone. It seems that its volume is way too 
+low and is barely audible even at max level (also set via alsamixer).
 
 TODO
 
