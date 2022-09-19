@@ -95,6 +95,15 @@ things fail completely. So for any successful sleep, NetworkManager needs to be
 stopped. Then it can sleep successfully for both supported mem_sleep modes
 (`s2idle`, deep), but only wakes up again for `s2idle`.
 
+So first task is to get the latest Linux Kernel which at the time of writing is
+6.0 (release candidate still). It can be installed easily thanks to the [Ubuntu Mainline Kernel PPA](https://kernel.ubuntu.com/~kernel-ppa/mainline/) - but
+there is a problem - like described in the microphone issue above, at the time
+of writing ZFS for linux does not support Kernel 6.0. So i backported the few
+relevant compatibility fixes from [here](https://github.com/openzfs/zfs/pull/13886) and
+rebuilt an updated zfs-onlinux package (find the packaging [here](https://github.com/longsleep/zfs-linux-deb).
+That makes Kernel 6.0 run quite nicely, and for this is a requirement for the
+suspend workaround described below.
+
 Waking up from `s2idle` requires the latest firmware to be insalled. I fetched
 `linux-firmware-20220913` which is the newest at the time of writing and it
 recently got updates for the amdgpu files.
