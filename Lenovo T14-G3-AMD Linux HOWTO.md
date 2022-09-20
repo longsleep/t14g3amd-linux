@@ -141,8 +141,9 @@ recently got updates for the amdgpu files.
 Extract the latest linux-firmware into `/lib/firmware/updates` and update the
 inird with `update-initramfs -c -k all`. Then reboot.
 
-Now to NetworkManager. For now we simply add two systemd services to stop
-NetworkManager before sleep and to restart it after resume.
+Everything regarding Wifi hangs as soon as NetworkManager recieves the suspend
+event and disconnects the Wifi card which happens before the scripts in 
+system-sleep are run. Thus, as a workaround, the following hooks are added:
 
 ```
 cat <<'EOF' > /etc/NetworkManager/dispatcher.d/pre-down.d/99-t14-g3-amd-suspend-fix
@@ -151,7 +152,7 @@ cat <<'EOF' > /etc/NetworkManager/dispatcher.d/pre-down.d/99-t14-g3-amd-suspend-
 # This is a hack to workaround hang if the T114 G3 AMD wifi device. This does
 # the trick until a proper fix is found by simply disabling Wifi completely if
 # the main wifi is about to go down. It has to be in the pre-down stage as the
-# down stage is too lage and hangs for unknown reason.
+# down stage is too late and hangs for unknown reason.
 
 if [ "$2" = "connectivity-change" ]; then
     exit 0;
@@ -191,10 +192,6 @@ esac
 EOF
 chmod 755 /usr/lib/systemd/system-sleep/99-t14-g3-amd-resume-fix
 ```
-
-Unfortunately this does not fix the problem. Everything regarding Wifi hangs as
-soon as NetworkManager recieves the suspend event and disconnects the Wifi card
-which happens before the scripts in system-sleep are run.
 
 Disconnecting Wifi manually before suspending, works fine. With the above hook
 scripts, a workaround has been made which is good enough for now.
