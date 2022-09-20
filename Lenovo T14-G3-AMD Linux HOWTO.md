@@ -58,14 +58,14 @@ The Hardware platform of the T14 Gen3 AMD is pretty new, so there are some Linux
 
 I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~1660780566~22.04~9d60db1`):
 
-- The internal microphone does not work (or very low volume)
+- The internal microphone volume is very low volume and unusable
 - ~My external USB microphone is way to low volume (not usable)~ -> **seems fixed, see below**
 - ~Suspend does not work with Wifi is connected (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants~ -> **workaround has been made, see below**
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
 
 
-### Fixing internal microphone
+### Fixing internal microphone volume
 
 Others reported problems with the microphone for older T14 generations, but
 Kernel 5.19 seems to have the quirks for the acp6x in place for `21CF` - so it
@@ -79,7 +79,34 @@ Backporting ZFS to support Kernel 6.0 (see below in the fixing suspend section)
 did unfortunately not fix the microphone. It seems that its volume is way too 
 low and is barely audible even at max level (also set via alsamixer).
 
-TODO
+Others have reported [similar issues](https://bbs.archlinux.org/viewtopic.php?pid=2056452) wit the `acp6x` based sound card.
+
+Pop!_OS uses Wireplumber, thus to configure alsa settings we must add a 
+corresponding Wireplumber configuration rule like so.
+
+```
+mkdir -p /etc/wireplumber/main.lua.d
+cat <<'EOF' > /etc/wireplumber/main.lua.d/51-alsa-fix-t14g3-mic.lua
+rule = {
+  matches = {
+    {
+      { "device.name", "equals", "alsa_card.pci-0000_04_00.6" },
+    },
+  },
+  apply_properties = {
+    -- Disable UCM profile to fix microphone.
+    ["api.alsa.use-ucm"] = false,
+  },
+}
+
+table.insert(alsa_monitor.rules, rule)
+EOF
+
+systemctl --user restart wireplumber
+
+Sadly, this did not help and looses the sink entirely.
+
+TODO, remains unfixed.
 
 
 ### Fixing external USB microphone
