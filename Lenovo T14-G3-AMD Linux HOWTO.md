@@ -103,6 +103,7 @@ table.insert(alsa_monitor.rules, rule)
 EOF
 
 systemctl --user restart wireplumber
+```
 
 Sadly, this did not help and looses the sink entirely.
 
