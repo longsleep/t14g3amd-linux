@@ -63,6 +63,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~Suspend does not work with Wifi is connected (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants~ -> **workaround has been made, see below**
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
+- The WWAN 4G modem does not work, no SIM card detected
 
 
 ### Fixing internal microphone volume
@@ -197,7 +198,7 @@ Disconnecting Wifi manually before suspending, works fine. With the above hook
 scripts, a workaround has been made which is good enough for now.
 
 
-### Fix hotkeys to switch workspaces
+### Fixing hotkeys to switch workspaces
 
 Useful with the following extension: https://github.com/mzur/gnome-shell-wsmatrix
 
@@ -215,7 +216,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-down '["<Shift>
 This problem is now fixed.
 
 
-## Fix fan speed indicator
+## Fixing fan speed indicator
 
 Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535
 in the vitals Gnome 3 extension while the fan really is off.
@@ -229,6 +230,11 @@ fan2:        65535 RPM
 ```
 
 TODO
+
+
+## Fixing WWAN 4G modem
+
+TODO, disabled it in BIOS for now.
 
 
 ## Secure boot for DKMS Kernel modules
