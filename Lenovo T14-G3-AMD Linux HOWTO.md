@@ -64,6 +64,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
 - The WWAN 4G modem does not work, no SIM card detected
+- Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crash? (happend once so far)
 
 
 ### Fixing internal microphone volume
@@ -80,7 +81,7 @@ Backporting ZFS to support Kernel 6.0 (see below in the fixing suspend section)
 did unfortunately not fix the microphone. It seems that its volume is way too 
 low and is barely audible even at max level (also set via alsamixer).
 
-Others have reported [similar issues](https://bbs.archlinux.org/viewtopic.php?pid=2056452) wit the `acp6x` based sound card.
+Others have reported [similar issues](https://bbs.archlinux.org/viewtopic.php?pid=2056452) with the `acp6x` based sound card.
 
 Pop!_OS uses Wireplumber, thus to configure alsa settings we must add a 
 corresponding Wireplumber configuration rule like so.
@@ -216,7 +217,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-down '["<Shift>
 This problem is now fixed.
 
 
-## Fixing fan speed indicator
+### Fixing fan speed indicator
 
 Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535
 in the vitals Gnome 3 extension while the fan really is off.
@@ -232,9 +233,45 @@ fan2:        65535 RPM
 TODO
 
 
-## Fixing WWAN 4G modem
+### Fixing WWAN 4G modem
 
 TODO, disabled it in BIOS for now.
+
+
+### Fixing GPU crash 
+
+This is the full log of the issue.
+
+```
+Sep 22 12:30:03 mose4 kernel: [drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout, signaled seq=344841, emitted seq=344843
+Sep 22 12:30:03 mose4 kernel: [drm:amdgpu_job_timedout [amdgpu]] *ERROR* Process information: process  pid 0 thread  pid 0
+Sep 22 12:30:03 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: GPU reset begin!
+Sep 22 12:30:03 mose4 kernel: amdgpu 0000:04:00.0: [drm:amdgpu_ring_test_helper [amdgpu]] *ERROR* ring kiq_2.1.0 test failed (-110)
+Sep 22 12:30:03 mose4 kernel: [drm:gfx_v10_0_hw_fini [amdgpu]] *ERROR* KGQ disable failed
+Sep 22 12:30:04 mose4 kernel: [drm:gfx_v10_0_cp_gfx_enable.isra.0 [amdgpu]] *ERROR* failed to halt cp gfx
+Sep 22 12:30:04 mose4 kernel: [drm] free PSP TMR buffer
+Sep 22 12:30:04 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: MODE2 reset
+Sep 22 12:30:04 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: GPU reset succeeded, trying to resume
+Sep 22 12:30:04 mose4 kernel: [drm] PCIE GART of 1024M enabled (table at 0x000000F43FC00000).
+Sep 22 12:30:04 mose4 kernel: [drm] VRAM is lost due to GPU reset!
+Sep 22 12:30:04 mose4 kernel: [drm] PSP is resuming...
+Sep 22 12:30:04 mose4 kernel: [drm] reserve 0xa00000 from 0xf41b000000 for PSP TMR
+Sep 22 12:30:04 mose4 kernel: [drm] failed to load ucode GLOBAL_TAP_DELAYS(0x23)
+Sep 22 12:30:04 mose4 kernel: [drm] psp gfx command LOAD_IP_FW(0x6) failed and response status is (0xFFFF0010)
+Sep 22 12:30:04 mose4 kernel: [drm] failed to load ucode SE0_TAP_DELAYS(0x24)
+Sep 22 12:30:04 mose4 kernel: [drm] psp gfx command LOAD_IP_FW(0x6) failed and response status is (0xFFFF0010)
+Sep 22 12:30:04 mose4 kernel: [drm] failed to load ucode SE1_TAP_DELAYS(0x25)
+Sep 22 12:30:04 mose4 kernel: [drm] psp gfx command LOAD_IP_FW(0x6) failed and response status is (0xFFFF0010)
+Sep 22 12:30:04 mose4 kernel: [drm] failed to load ucode SE2_TAP_DELAYS(0x26)
+Sep 22 12:30:04 mose4 kernel: [drm] psp gfx command LOAD_IP_FW(0x6) failed and response status is (0xFFFF0010)
+Sep 22 12:30:04 mose4 kernel: [drm] failed to load ucode SE3_TAP_DELAYS(0x27)
+Sep 22 12:30:04 mose4 kernel: [drm] psp gfx command LOAD_IP_FW(0x6) failed and response status is (0xFFFF0010)
+Sep 22 12:30:04 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: RAS: optional ras ta ucode is not available
+```
+
+System is still operational, but the screen (both internal and external) is black.
+
+It happend once so far - needs more investigation.
 
 
 ## Secure boot for DKMS Kernel modules
