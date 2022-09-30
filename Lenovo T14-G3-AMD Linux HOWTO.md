@@ -64,7 +64,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
 - The WWAN 4G modem does not work, no SIM card detected
-- Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crash? (happend once so far)
+- Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
 
 
 ### Fixing internal microphone volume
@@ -271,7 +271,10 @@ Sep 22 12:30:04 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: RAS: optional ras ta 
 
 System is still operational, but the screen (both internal and external) is black.
 
-It happend once so far - needs more investigation.
+It happens every once in a while - needs more investigation. 
+
+I updated the BIOS/UEFI to the 1.29 as provided by Lenovo in their Drivers & 
+Software download section - let's see if that changes anything.
 
 
 ## Secure boot for DKMS Kernel modules
