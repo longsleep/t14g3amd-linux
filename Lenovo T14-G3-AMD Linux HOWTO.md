@@ -63,7 +63,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~Suspend does not work with Wifi is connected (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants~ -> **workaround has been made, see below**
 - ~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~ -> **fixed, see below**
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
-- The WWAN 4G modem does not work, no SIM card detected
+- The WWAN 4G modem does not work, no SIM card detected -> **fixed, see below***
 - Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
 
 
@@ -120,6 +120,10 @@ This problem is now fixed.
 
 
 ### Fixing suspend
+
+Update: There are some hints in the [Lenovo Forum](https://forums.lenovo.com/t5/Other-Linux-Discussions/T14s-G3-AMD-Linux-Sleep/m-p/5172287?page=1#5758208) which need processing. So far it seems that updating the
+BIOS to latest version fixes most of the `s2idle` and disabples `deep` completely
+as it is not supported in the first place. So the steps below still stand.
 
 By default neither of the sleep modes possible in BIOS worked for me. One part
 of the problem seem to be NetworkManager which simply hangs on suspend and makes
@@ -199,6 +203,8 @@ Disconnecting Wifi manually before suspending, works fine. With the above hook
 scripts, a workaround has been made which is good enough for now.
 
 
+
+
 ### Fixing hotkeys to switch workspaces
 
 Useful with the following extension: https://github.com/mzur/gnome-shell-wsmatrix
@@ -233,9 +239,22 @@ fan2:        65535 RPM
 TODO
 
 
-### Fixing WWAN 4G modem
+### Fixing WWAN 4G modem (Quectel EM05-G)
 
-TODO, disabled it in BIOS for now.
+The Quectel EM05-G needs a unlock script to be added to ModemManager (see [this PR](https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/merge_requests/902/diffs)). Furthermore, by default the modem uses
+the second SIM slot (eSIM?), so no SIM card is detected by default. The following
+set of commands fixes all the issues.
+
+```
+sudo apt install -y libmbim-utils
+curl -s https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/ead9f1809f6fa0d94723620b66078da6a168716b/data/dispatcher-fcc-unlock/2c7c | sudo tee /usr/share/ModemManager/fcc-unlock.available.d/2c7c
+sudo chmod 755 /usr/share/ModemManager/fcc-unlock.available.d/2c7c
+sudo ln -s /usr/share/ModemManager/fcc-unlock.available.d/2c7c /etc/ModemManager/fcc-unlock.d/2c7c:030a
+sudo systemctl restart ModemManager
+sudo mmcli -m 0 --set-primary-sim-slot=1
+```
+
+Afterwards, the modem works just fine.
 
 
 ### Fixing GPU crash 
