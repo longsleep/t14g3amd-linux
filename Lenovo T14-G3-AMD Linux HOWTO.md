@@ -136,7 +136,7 @@ rebuilt an updated zfs-onlinux package (find the packaging [here](https://github
 That makes Kernel 6.0 run quite nicely, and for this is a requirement for the
 suspend workaround described below.
 
-Waking up from `s2idle` requires the latest firmware to be insalled. I fetched
+Waking up from `s2idle` requires the latest firmware to be installed. I fetched
 `linux-firmware-20220913` which is the newest at the time of writing and it
 recently got updates for the amdgpu files.
 
