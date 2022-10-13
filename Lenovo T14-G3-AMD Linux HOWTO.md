@@ -296,6 +296,16 @@ I updated the BIOS/UEFI to the 1.29 as provided by Lenovo in their Drivers &
 Software download section - let's see if that changes anything.
 
 
+### Enable fingerprint reader
+
+```
+sudo apt install libpam-fprintd
+```
+
+Now you can enroll your fingerprints with `fprintd-enroll`. Then you can use
+fingerprint instead of password to login/unlock your user account.
+
+
 ## Secure boot for DKMS Kernel modules
 
 NOTE: This section does not work, so ignore for now. Since we need a very new
