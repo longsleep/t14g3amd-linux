@@ -51,7 +51,6 @@ apt install --yes \
 This pretty much gives me the basic software to use my [bin-scripts](https://github.com/longsleep/bin-scripts) repository.
 Its now left to the reader how to configure the individual environment.
 
-
 ## Issues
 
 The Hardware platform of the T14 Gen3 AMD is pretty new, so there are some Linux compatibilitiy issues.
@@ -65,7 +64,6 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
 - The WWAN 4G modem does not work, no SIM card detected -> **fixed, see below***
 - Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
-
 
 ### Fixing internal microphone volume
 
@@ -111,23 +109,20 @@ Sadly, this did not help and looses the sink entirely.
 
 TODO, remains unfixed.
 
-
 ### Fixing external USB microphone
 
 Not sure about this one, the problem went away after using alsamixing and sound settings volume control a couple of times.
 
 This problem is now fixed.
 
-
 ### Fixing suspend
 
 Update: There are some hints in the [Lenovo Forum](https://forums.lenovo.com/t5/Other-Linux-Discussions/T14s-G3-AMD-Linux-Sleep/m-p/5172287?page=1#5758208) which need processing. So far it seems that updating the
-BIOS to latest version fixes most of the `s2idle` and disabples `deep` completely
+BIOS to latest version fixes most of the `s2idle` and disables `deep` completely
 as it is not supported in the first place. So the steps below still stand.
 
 By default neither of the sleep modes possible in BIOS worked for me. One part
-of the problem seem to be NetworkManager which simply hangs on suspend and makes
-things fail completely. So for any successful sleep, NetworkManager needs to be
+of the problem seem to be NetworkManager which simply hangs on suspend and makes things fail completely. So for any successful sleep, NetworkManager needs to be
 stopped. Then it can sleep successfully for both supported mem_sleep modes
 (`s2idle`, deep), but only wakes up again for `s2idle`.
 
@@ -145,9 +140,9 @@ Waking up from `s2idle` requires the latest firmware to be installed. I fetched
 recently got updates for the amdgpu files.
 
 Extract the latest linux-firmware into `/lib/firmware/updates` and update the
-inird with `update-initramfs -c -k all`. Then reboot.
+initrd with `update-initramfs -c -k all`. Then reboot.
 
-Everything regarding Wifi hangs as soon as NetworkManager recieves the suspend
+Everything regarding Wifi hangs as soon as NetworkManager receives the suspend
 event and disconnects the Wifi card which happens before the scripts in 
 system-sleep are run. Thus, as a workaround, the following hooks are added:
 
@@ -202,9 +197,6 @@ chmod 755 /usr/lib/systemd/system-sleep/99-t14-g3-amd-resume-fix
 Disconnecting Wifi manually before suspending, works fine. With the above hook
 scripts, a workaround has been made which is good enough for now.
 
-
-
-
 ### Fixing hotkeys to switch workspaces
 
 Useful with the following extension: https://github.com/mzur/gnome-shell-wsmatrix
@@ -222,7 +214,6 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-down '["<Shift>
 
 This problem is now fixed.
 
-
 ### Fixing fan speed indicator
 
 Not a big deal, but the fan speed sometimes get reported wrong. It shows 65535
@@ -237,7 +228,6 @@ fan2:        65535 RPM
 ```
 
 TODO
-
 
 ### Fixing WWAN 4G modem (Quectel EM05-G)
 
@@ -256,8 +246,7 @@ sudo mmcli -m 0 --set-primary-sim-slot=1
 
 Afterwards, the modem works just fine.
 
-
-### Fixing GPU crash 
+### Fixing GPU crash
 
 This is the full log of the issue.
 
@@ -295,7 +284,6 @@ It happens every once in a while - needs more investigation.
 I updated the BIOS/UEFI to the 1.29 as provided by Lenovo in their Drivers & 
 Software download section - let's see if that changes anything.
 
-
 ### Enable fingerprint reader
 
 ```
@@ -304,7 +292,6 @@ sudo apt install libpam-fprintd
 
 Now you can enroll your fingerprints with `fprintd-enroll`. Then you can use
 fingerprint instead of password to login/unlock your user account.
-
 
 ## Secure boot for DKMS Kernel modules
 
@@ -352,8 +339,6 @@ The key is now available in `/proc/keys`.
 vi /etc/dkms/framework.conf
 # Uncomment the # sing_tool line at the bottom.
 # Save and quit.
-
 ```
 
 Well, that did not work - figure out a way.
-
