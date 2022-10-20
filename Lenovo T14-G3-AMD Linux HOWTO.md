@@ -51,6 +51,17 @@ apt install --yes \
 This pretty much gives me the basic software to use my [bin-scripts](https://github.com/longsleep/bin-scripts) repository.
 Its now left to the reader how to configure the individual environment.
 
+Finally, since this device has a built-in Ethernet port, we enable Ethernet for NetworkManager like:
+
+```
+cat <<'EOF' > /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+[keyfile]
+unmanaged-devices=*,except:type:wifi,except:type:gsm,except:type:cdma,except:type:ethernet
+EOF
+
+systemctl restart NetworkManager
+```
+
 ## Issues
 
 The Hardware platform of the T14 Gen3 AMD is pretty new, so there are some Linux compatibilitiy issues.
