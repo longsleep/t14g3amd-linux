@@ -288,10 +288,13 @@ Sep 22 12:30:04 mose4 kernel: amdgpu 0000:04:00.0: amdgpu: RAS: optional ras ta 
 
 System is still operational, but the screen (both internal and external) is black.
 
-It happens every once in a while - needs more investigation. 
+It happens every once in a while - needs more investigation. I am running an external USB-C display most of the time and so far this crash never happend when not using a USB-C display so there might be some connection.
 
 I updated the BIOS/UEFI to the 1.29 as provided by Lenovo in their Drivers & 
-Software download section - let's see if that changes anything.
+Software download section - let's see if that changes anything (update: it didn't). 
+I updated the BIOS/UEFI to 1.32 and the problem still appears.
+
+I updated to Kernel 6.1.0-rc5, let's see if that improves things.
 
 ### Enable fingerprint reader
 
