@@ -72,7 +72,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~~My external USB microphone is way to low volume (not usable)~~ -> **seems fixed, see below**
 - ~~Suspend does not work with Wifi is connected (no matter if S3 Linux or Windows and Linux is set in BIOS), both "s2idle" and "deep" crashes, hang or do not properly resume in various variants~~ -> **workaround has been made, see below**
 - ~~Hotkeys to switch workspaces do not work, especially when using Workspace matrix~~ -> **fixed, see below**
-- Fan speed indicator sometimes does show bogus values when fan is off -> **not really a problem, see below**
+- ~~Fan speed indicator sometimes does show bogus values when fan is off~~ -> **fixed, see below**
 - ~~The WWAN 4G modem does not work, no SIM card detected~~ -> **fixed, see below***
 - Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
 
@@ -236,7 +236,7 @@ fan1:           0 RPM
 fan2:        65535 RPM
 ```
 
-TODO
+This problem is fixed after update to Linux Kernel 6.1 (current at 6.1.0-rc5).
 
 ### Fixing WWAN 4G modem (Quectel EM05-G)
 
