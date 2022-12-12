@@ -75,6 +75,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~~Fan speed indicator sometimes does show bogus values when fan is off~~ -> **fixed, see below**
 - ~~The WWAN 4G modem does not work, no SIM card detected~~ -> **fixed, see below***
 - Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
+- HDMI audio output not available in wireplumber with Kernel 6.1
 
 ### Fixing internal microphone volume
 
@@ -92,33 +93,9 @@ low and is barely audible even at max level (also set via alsamixer).
 
 Others have reported [similar issues](https://bbs.archlinux.org/viewtopic.php?pid=2056452) with the `acp6x` based sound card.
 
-Pop!_OS uses Wireplumber, thus to configure alsa settings we must add a 
-corresponding Wireplumber configuration rule like so.
+Pop!_OS uses Wireplumber.
 
-```
-mkdir -p /etc/wireplumber/main.lua.d
-cat <<'EOF' > /etc/wireplumber/main.lua.d/51-alsa-fix-t14g3-mic.lua
-rule = {
-  matches = {
-    {
-      { "device.name", "equals", "alsa_card.pci-0000_04_00.6" },
-    },
-  },
-  apply_properties = {
-    -- Disable UCM profile to fix microphone.
-    ["api.alsa.use-ucm"] = false,
-  },
-}
-
-table.insert(alsa_monitor.rules, rule)
-EOF
-
-systemctl --user restart wireplumber
-```
-
-Sadly, this did not help and looses the sink entirely.
-
-TODO, remains unfixed.
+After Update to Kernel 6.1 (including backport of ZFS), the microphone works, but volume is still quite low.
 
 ### Fixing external USB microphone
 
@@ -295,6 +272,32 @@ Software download section - let's see if that changes anything (update: it didn'
 I updated the BIOS/UEFI to 1.32 and the problem still appears.
 
 I updated to Kernel 6.1.0-rc5, let's see if that improves things.
+
+### Fixing HDMI audio output with Kernel 6.1
+
+After update to Kernel 6.1, the HDMI audio output was no longer visible in wireplumber. After debugging, it seems ALSA has trouble getting the ucm profiles. Thus an easy workaround is to disable the UCM profiles like so:
+
+```bash
+mkdir -p /etc/wireplumber/main.lua.d
+cat <<'EOF' > /etc/wireplumber/main.lua.d/51-alsa-fix-t14g3-hdmi.lua
+rule = {
+  matches = {
+    {
+      { "device.name", "equals", "alsa_card.pci-0000_04_00.1" },
+    },
+  },
+  apply_properties = {
+    -- Disable UCM profile to fix HDMI output no profiles.
+    ["api.alsa.use-ucm"] = false,
+  },
+}
+table.insert(alsa_monitor.rules, rule)
+EOF
+
+systemctl --user restart wireplumber
+```
+
+Afterwards HDMI audio just works fine again.
 
 ### Enable fingerprint reader
 
