@@ -75,7 +75,7 @@ I see the following issues (Kernel `5.19.0-76051900-generic #202207312230~166078
 - ~~Fan speed indicator sometimes does show bogus values when fan is off~~ -> **fixed, see below**
 - ~~The WWAN 4G modem does not work, no SIM card detected~~ -> **fixed, see below***
 - Screen sometimes turns black (`[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring sdma0 timeout`), GPU driver crashes (happens every couple of days, reason unknown), needs reboot to get functioning again
-- HDMI audio output not available in wireplumber with Kernel 6.1
+- ~~HDMI audio output not available in wireplumber with Kernel 6.1~~ **workaround, see below**
 
 ### Fixing internal microphone volume
 
@@ -272,6 +272,10 @@ Software download section - let's see if that changes anything (update: it didn'
 I updated the BIOS/UEFI to 1.32 and the problem still appears.
 
 I updated to Kernel 6.1.0-rc5, let's see if that improves things.
+
+This issue is now tracked at https://gitlab.freedesktop.org/drm/amd/-/issues/2220 - no solution as of now. It might improve with Kernel 6.3.
+
+I updated to Kernel 6.2.0-rc4, let's see if that improves things.
 
 ### Fixing HDMI audio output with Kernel 6.1
 
