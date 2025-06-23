@@ -183,6 +183,52 @@ chmod 755 /usr/lib/systemd/system-sleep/99-t14-g3-amd-resume-fix
 Disconnecting Wifi manually before suspending, works fine. With the above hook
 scripts, a workaround has been made which is good enough for now.
 
+#### Alternative (untested)
+
+As found in the Ach Wiki https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14_(AMD)_Gen_3
+
+```
+cat <<'EOF' > /etc/systemd/system/ath11k-suspend.service
+[Unit]
+Description=Suspend: rmmod ath11k_pci
+Before=sleep.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/rmmod ath11k_pci
+
+[Install]
+WantedBy=sleep.target
+EOF
+
+cat <<'EOF' > /etc/systemd/system/ath11k-resume.service
+[Unit]
+Description=Resume: modprobe ath11k_pci
+After=suspend.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/modprobe ath11k_pci
+
+[Install]
+WantedBy=suspend.target
+EOF
+
+systemctl enable ath11k-suspend.service
+systemctl enable ath11k-resume.service
+```
+
+### Disable wakeup from sleep on touchpad activity
+
+The system randomnly wakes up from sleep when carried moved. Seems to be related
+to the touchpad. Disable wakeup for it like so:
+
+```
+cat <<'EOF' > /etc/udev/rules.d/99-t14-g3-disable-touchpad-wakeup.rules
+KERNEL=="i2c-ELAN0678:00", SUBSYSTEM=="i2c", ATTR{power/wakeup}="disabled"
+EOF
+```
+
 ### Fixing hotkeys to switch workspaces
 
 Useful with the following extension: https://github.com/mzur/gnome-shell-wsmatrix
@@ -311,6 +357,13 @@ sudo apt install libpam-fprintd
 
 Now you can enroll your fingerprints with `fprintd-enroll`. Then you can use
 fingerprint instead of password to login/unlock your user account.
+
+### Green artifacts with Kernel 6.12
+
+- https://bbs.archlinux.org/viewtopic.php?id=301280
+
+Some reports say `amdgpu.dcdebugmask=0x10` fixes this - need to test it.
+
 
 ## Secure boot for DKMS Kernel modules
 
